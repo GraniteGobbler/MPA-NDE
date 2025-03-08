@@ -611,6 +611,22 @@
     [
       "6d7602eb-73a0-43e5-bb95-aef89688bbbb",
       "Root"
+    ],
+    [
+      "b39e36d0-0d46-4645-8a18-09839886ef6a",
+      "H-mostík"
+    ],
+    [
+      "b8af9708-3ccf-4d49-9229-e96ce10c6575",
+      "Magnetometer"
+    ],
+    [
+      "73db90c7-ab74-4221-aa17-55f6bffae566",
+      "Gyroskop"
+    ],
+    [
+      "6c11cebb-cfdc-4e56-8d99-e5f4cba37c8d",
+      "BlackPill V3.0"
     ]
   ],
   "text_variables": {}

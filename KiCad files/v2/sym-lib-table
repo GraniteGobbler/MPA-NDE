@@ -1,4 +1,0 @@
-(sym_lib_table
-  (version 7)
-  (lib (name "NDE_lib")(type "KiCad")(uri "${KIPRJMOD}/NDE_lib.kicad_sym")(options "")(descr ""))
-)

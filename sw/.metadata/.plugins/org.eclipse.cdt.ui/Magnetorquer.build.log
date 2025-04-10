@@ -1,0 +1,17 @@
+10:39:33 **** Incremental Build of configuration Debug for project Magnetorquer ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/stm32f4xx_hal_msp.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/stm32f4xx_hal_msp.d" -MT"Core/Src/stm32f4xx_hal_msp.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/stm32f4xx_hal_msp.o"
+arm-none-eabi-gcc -o "Magnetorquer.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\slava\Documents\VUT\MPA-NDE\sw\Magnetorquer\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Magnetorquer.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Magnetorquer.elf
+ 
+arm-none-eabi-size  Magnetorquer.elf 
+arm-none-eabi-objdump -h -S Magnetorquer.elf  > "Magnetorquer.list"
+   text	   data	    bss	    dec	    hex	filename
+  52116	    852	   9256	  62224	   f310	Magnetorquer.elf
+Finished building: default.size.stdout
+ 
+Finished building: Magnetorquer.list
+ 
+
+10:39:34 Build Finished. 0 errors, 0 warnings. (took 997ms)
+

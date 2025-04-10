@@ -1,6 +1,6 @@
 #MicroXplorer Configuration settings - do not modify
-CAD.formats=
-CAD.pinconfig=
+CAD.formats=[]
+CAD.pinconfig=Dual
 CAD.provider=
 File.Version=6
 I2C1.I2C_Mode=I2C_Standard
@@ -29,8 +29,8 @@ Mcu.PinsNb=8
 Mcu.ThirdPartyNb=0
 Mcu.UserConstants=
 Mcu.UserName=STM32F411CEUx
-MxCube.Version=6.13.0
-MxDb.Version=DB.6.0.130
+MxCube.Version=6.14.0
+MxDb.Version=DB.6.0.140
 NVIC.BusFault_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
 NVIC.DebugMonitor_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
 NVIC.ForceEnableDMAVector=true

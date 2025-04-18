@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
-#include "usb_device.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -90,7 +89,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
   QMC_init(&compassStruct, &hi2c1, 200);
   while (MPU6050_Init(&hi2c1) == 1);
@@ -101,15 +99,15 @@ int main(void)
   while (1)
   {
 	  MPU6050_Read_All(&hi2c1, &MPU6050);
-	  printf("\033[2J\033[H"); //Clear terminal
-	  printf("Kalman X: %f, Kalman Y: %f \r\n", MPU6050.KalmanAngleX, MPU6050.KalmanAngleY);
+	  //printf("\033[2J\033[H"); //Clear terminal
+	  //printf("Kalman X: %f, Kalman Y: %f \r\n", MPU6050.KalmanAngleX, MPU6050.KalmanAngleY);
 	  //Read only when new data is available
 	  if(QMC_read(&compassStruct)==0){
-		  printf("Compass value: %0.2f\r\n", compassStruct.heading);
-		  printf("X: %d, Y: %d, Z: %d\r\n", compassStruct.Xaxis, compassStruct.Yaxis, compassStruct.Zaxis);
+		  //printf("Compass value: %0.2f\r\n", compassStruct.heading);
+		  //printf("X: %d, Y: %d, Z: %d\r\n", compassStruct.Xaxis, compassStruct.Yaxis, compassStruct.Zaxis);
 	  }
 	  else {
-		  printf("Error reading compass data\r\n");
+		  //printf("Error reading compass data\r\n");
 		}
 	  HAL_Delay(100); //100ms delay
     /* USER CODE END WHILE */
@@ -168,7 +166,7 @@ void SystemClock_Config(void)
 int _write(int file, char const *buf, int n)
 {
 	/* stdout redirection to USB CDC */
-	CDC_Transmit_FS((uint8_t*)(buf), n);
+	//CDC_Transmit_FS((uint8_t*)(buf), n);
 	return n;
 }
 /* USER CODE END 4 */

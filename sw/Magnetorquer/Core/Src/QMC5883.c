@@ -40,16 +40,22 @@ uint8_t QMC_read(QMC_t *qmc)
 		  qmc->Yaxis= (qmc->datas[3]<<8) | qmc->datas[2];
 		  qmc->Zaxis= (qmc->datas[5]<<8) | qmc->datas[4];
 
-		  qmc->compas=atan2f(qmc->Yaxis,qmc->Xaxis)*180.00/M_PI;
+		  qmc->compas=atan2f(qmc->Zaxis,qmc->Yaxis)*180.00/M_PI;
+		  qmc->headingXY=atan2f(qmc->Xaxis,qmc->Yaxis)*180/M_PI;
+		  qmc->headingXZ=atan2f(qmc->Xaxis,qmc->Zaxis)*180/M_PI;
+		  qmc->headingYX=atan2f(qmc->Yaxis,qmc->Xaxis)*180/M_PI;
+		  qmc->headingYZ=atan2f(qmc->Yaxis,qmc->Zaxis)*180/M_PI;
+		  qmc->headingZX=atan2f(qmc->Zaxis,qmc->Xaxis)*180/M_PI;
+		  qmc->headingZY=atan2f(qmc->Zaxis,qmc->Yaxis)*180/M_PI;
 
-		  if(qmc->compas>0)
-		  {
-			  qmc->heading= qmc->compas;
-		  }
-		  else
-		  {
-			  qmc->heading=360+qmc->compas;
-		  }
+//		  if(qmc->compas>0)
+//		  {
+//			  qmc->heading= qmc->compas;
+//		  }
+//		  else
+//		  {
+//			  qmc->heading=360+qmc->compas;
+//		  }
 	  }
 	  else
 	  {
@@ -61,7 +67,7 @@ return 0;
 float QMC_readHeading(QMC_t *qmc)
 {
 	QMC_read(qmc);
-	return qmc->heading;
+	//return qmc->heading;
 }
 
 uint8_t QMC_Standby(QMC_t *qmc)

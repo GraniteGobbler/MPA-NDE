@@ -61,10 +61,10 @@ void Error_Handler(void);
 #define COIL_Y_1_GPIO_Port GPIOA
 #define COIL_Y_2_Pin GPIO_PIN_10
 #define COIL_Y_2_GPIO_Port GPIOA
-#define COIL_X_2_Pin GPIO_PIN_11
-#define COIL_X_2_GPIO_Port GPIOA
-#define COIL_X_1_Pin GPIO_PIN_15
-#define COIL_X_1_GPIO_Port GPIOA
+#define COIL_X2_Pin GPIO_PIN_11
+#define COIL_X2_GPIO_Port GPIOA
+#define COIL_X1_Pin GPIO_PIN_15
+#define COIL_X1_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

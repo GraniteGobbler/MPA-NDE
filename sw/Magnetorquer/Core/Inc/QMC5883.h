@@ -29,12 +29,7 @@ typedef struct QMC
 	int16_t             Xaxis;
 	int16_t             Yaxis;
 	int16_t             Zaxis;
-	float			    headingXY;
-	float			    headingXZ;
-	float			    headingYX;
-	float			    headingYZ;
-	float			    headingZX;
-	float			    headingZY;
+	float		    	heading;
 	float               compas;
 }QMC_t;
 //#########################################################################################################

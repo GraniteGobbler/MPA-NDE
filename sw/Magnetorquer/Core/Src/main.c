@@ -18,7 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "crc.h"
 #include "i2c.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -34,7 +36,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-QMC_t compassStruct;
+#define VERSION_STR_LENG  35
+#define SAMPLE_FREQ	50
+/* Define aliases for timer channels */
+#define COIL_Y1 TIM_CHANNEL_2
+#define COIL_Y2 TIM_CHANNEL_3
+#define COIL_X2 TIM_CHANNEL_4
+#define COIL_X1 TIM_CHANNEL_2
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -46,12 +54,15 @@ QMC_t compassStruct;
 
 /* USER CODE BEGIN PV */
 MPU6050_t MPU6050;
+QMC_t compassStruct;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 int _write(int file, char const *buf, int n);
+void SetPWMDutyCycle(TIM_HandleTypeDef *htim, uint32_t channel, uint8_t dutyCycle);
+void UpdateAllPWMDutyCycles(uint8_t dutyCycle);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -76,22 +87,34 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+//  MEC_input_t data_in;
+//  MEC_output_t data_out;
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  //Init PWM
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_CRC_Init();
   MX_I2C1_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  //Set all timers to 0% duty cycle
+  UpdateAllPWMDutyCycles(0);
+
   QMC_init(&compassStruct, &hi2c1, 200);
   while (MPU6050_Init(&hi2c1) == 1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -99,17 +122,11 @@ int main(void)
   while (1)
   {
 	  MPU6050_Read_All(&hi2c1, &MPU6050);
-	  //printf("\033[2J\033[H"); //Clear terminal
-	  //printf("Kalman X: %f, Kalman Y: %f \r\n", MPU6050.KalmanAngleX, MPU6050.KalmanAngleY);
-	  //Read only when new data is available
-	  if(QMC_read(&compassStruct)==0){
-		  //printf("Compass value: %0.2f\r\n", compassStruct.heading);
-		  //printf("X: %d, Y: %d, Z: %d\r\n", compassStruct.Xaxis, compassStruct.Yaxis, compassStruct.Zaxis);
-	  }
-	  else {
-		  //printf("Error reading compass data\r\n");
-		}
-	  HAL_Delay(100); //100ms delay
+	  QMC_read(&compassStruct);
+//	  SetPWMDutyCycle(&htim1, COIL_X2, 0);
+//	  HAL_Delay(500);
+//	  SetPWMDutyCycle(&htim1, COIL_X2, 75);
+	  HAL_Delay(10);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -169,6 +186,27 @@ int _write(int file, char const *buf, int n)
 	//CDC_Transmit_FS((uint8_t*)(buf), n);
 	return n;
 }
+
+void SetPWMDutyCycle(TIM_HandleTypeDef *htim, uint32_t channel, uint8_t dutyCycle)
+{
+    if (dutyCycle > 100) dutyCycle = 100; // Limit duty cycle to 100%
+    uint32_t period = __HAL_TIM_GET_AUTORELOAD(htim); // Get the timer period
+    uint32_t pulse = (period * dutyCycle) / 100; // Calculate the pulse width
+    __HAL_TIM_SET_COMPARE(htim, channel, pulse); // Set the CCR value
+}
+
+void UpdateAllPWMDutyCycles(uint8_t dutyCycle)
+{
+    // Update duty cycle for TIM1 channels
+    SetPWMDutyCycle(&htim1, TIM_CHANNEL_2, dutyCycle);
+    SetPWMDutyCycle(&htim1, TIM_CHANNEL_3, dutyCycle);
+    SetPWMDutyCycle(&htim1, TIM_CHANNEL_4, dutyCycle);
+
+    // Update duty cycle for TIM2 channel
+    SetPWMDutyCycle(&htim2, TIM_CHANNEL_1, dutyCycle);
+}
+
+
 /* USER CODE END 4 */
 
 /**

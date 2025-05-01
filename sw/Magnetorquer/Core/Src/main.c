@@ -19,12 +19,15 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "QMC5883.h"
 #include "mpu6050.h"
+#include "math.h"
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,7 +37,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-QMC_t compassStruct;
+#define VERSION_STR_LENG  35
+#define SAMPLE_FREQ	50
+/* Define aliases for timer channels */
+#define COIL_Y1 TIM_CHANNEL_2
+#define COIL_Y2 TIM_CHANNEL_3
+#define COIL_X2 TIM_CHANNEL_4
+#define COIL_X1 TIM_CHANNEL_1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -46,12 +55,17 @@ QMC_t compassStruct;
 
 /* USER CODE BEGIN PV */
 MPU6050_t MPU6050;
+QMC_t compassStruct;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 int _write(int file, char const *buf, int n);
+void SetPWMDutyCycle(TIM_HandleTypeDef *htim, uint32_t channel, uint8_t dutyCycle);
+void UpdateAllPWMDutyCycles(uint8_t dutyCycle);
+void SetCoilAngle(float angle);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -68,6 +82,7 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -76,40 +91,66 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  QMC_init(&compassStruct, &hi2c1, 200);
+  /* Initialize all PWM channels */
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+
+  //Set all timers to 0% duty cycle
+  UpdateAllPWMDutyCycles(0);
+
+
+  while(QMC_init(&compassStruct, &hi2c1, 200) == 1);
   while (MPU6050_Init(&hi2c1) == 1);
+
+  // Set LED on if successful init
+  HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, 0);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  static float coilAntiAngle = 0.0f;
+
+	  //Deenergize coils
+	  UpdateAllPWMDutyCycles(0);
+
+	  HAL_Delay(100);
+
+	  // Read sensor data
 	  MPU6050_Read_All(&hi2c1, &MPU6050);
-	  //printf("\033[2J\033[H"); //Clear terminal
-	  //printf("Kalman X: %f, Kalman Y: %f \r\n", MPU6050.KalmanAngleX, MPU6050.KalmanAngleY);
-	  //Read only when new data is available
-	  if(QMC_read(&compassStruct)==0){
-		  //printf("Compass value: %0.2f\r\n", compassStruct.heading);
-		  //printf("X: %d, Y: %d, Z: %d\r\n", compassStruct.Xaxis, compassStruct.Yaxis, compassStruct.Zaxis);
+	  QMC_read(&compassStruct);
+
+	  // Tolerance of x degrees
+	  if(fabs(compassStruct.compas) > 10.0){
+
+		  //Compute opposite angle to external field, needs to be remapped since the magnetometer 0° and coil 0° are offset
+		  // 360 - (External Angle) + 270
+		  coilAntiAngle = 630 - compassStruct.heading;
+
+		  //Set coil angle
+		  SetCoilAngle(coilAntiAngle);
+		  HAL_Delay(500);
+
 	  }
-	  else {
-		  //printf("Error reading compass data\r\n");
-		}
-	  HAL_Delay(100); //100ms delay
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -169,6 +210,60 @@ int _write(int file, char const *buf, int n)
 	//CDC_Transmit_FS((uint8_t*)(buf), n);
 	return n;
 }
+
+void SetPWMDutyCycle(TIM_HandleTypeDef *htim, uint32_t channel, uint8_t dutyCycle)
+{
+    if (dutyCycle > 100) dutyCycle = 100; // Limit duty cycle to 100%
+    uint32_t period = __HAL_TIM_GET_AUTORELOAD(htim); // Get the timer period
+    uint32_t pulse = (period * dutyCycle) / 100; // Calculate the pulse width
+    __HAL_TIM_SET_COMPARE(htim, channel, pulse); // Set the CCR value
+}
+
+void UpdateAllPWMDutyCycles(uint8_t dutyCycle)
+{
+    // Update duty cycle for TIM1 channels
+    SetPWMDutyCycle(&htim1, TIM_CHANNEL_2, dutyCycle);
+    SetPWMDutyCycle(&htim1, TIM_CHANNEL_3, dutyCycle);
+    SetPWMDutyCycle(&htim1, TIM_CHANNEL_4, dutyCycle);
+
+    // Update duty cycle for TIM2 channel
+    SetPWMDutyCycle(&htim2, TIM_CHANNEL_1, dutyCycle);
+}
+
+void SetCoilAngle(float angle){
+
+	static int8_t x = 0;	 // X Coil component
+	static int8_t y = 0;	 // Y Coil component
+	static float DutyMax = 100.0f;	//Maximum duty cycle value
+
+	//Calculate X and Y components
+	x = (int8_t) floor(DutyMax * cos(angle));
+	y = (int8_t) floor(DutyMax * sin(angle));
+
+	//Polarity handling
+	if(x < 0){
+		SetPWMDutyCycle(&htim2, COIL_X1, 0);
+		SetPWMDutyCycle(&htim1, COIL_X2, (uint8_t) abs(x));
+	}
+	else{
+		SetPWMDutyCycle(&htim1, COIL_X2, 0);
+		SetPWMDutyCycle(&htim2, COIL_X1, (uint8_t) abs(x));
+	}
+
+	if(y < 0){
+		SetPWMDutyCycle(&htim1, COIL_Y1, 0);
+		SetPWMDutyCycle(&htim1, COIL_Y2, (uint8_t) abs(y));
+	}
+	else{
+		SetPWMDutyCycle(&htim1, COIL_Y2, 0);
+		SetPWMDutyCycle(&htim1, COIL_Y1, (uint8_t) abs(y));
+	}
+
+}
+
+
+
+
 /* USER CODE END 4 */
 
 /**

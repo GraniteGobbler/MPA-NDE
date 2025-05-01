@@ -47,7 +47,7 @@
 
 // Setup MPU6050
 #define MPU6050_ADDR 0xD0
-const uint16_t i2c_timeout = 100;
+const uint16_t i2c_timeout = 200;
 const double Accel_Z_corrector = 14418.0;
 
 uint32_t timer;

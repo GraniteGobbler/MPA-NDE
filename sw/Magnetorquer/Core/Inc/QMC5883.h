@@ -20,6 +20,13 @@
 #define QMC_OK 0
 #define QMC_FALSE 1
 //#########################################################################################################
+// Kalman filter structure
+typedef struct {
+    float estimate;       // Current estimate
+    float error_cov;      // Error covariance
+    float process_noise;  // Process noise
+    float measurement_noise; // Measurement noise
+} KalmanFilter_t;
 
 typedef struct QMC
 {
@@ -29,24 +36,20 @@ typedef struct QMC
 	int16_t             Xaxis;
 	int16_t             Yaxis;
 	int16_t             Zaxis;
-	float			    headingXY;
-	float			    headingXZ;
-	float			    headingYX;
-	float			    headingYZ;
-	float			    headingZX;
-	float			    headingZY;
+	float			    heading;
 	float               compas;
+	float 				filtered_heading; // Filtered heading
+	float 				filtered_compas; // Filtered compass
+    KalmanFilter_t kalman_filter; // Kalman filter instance
 }QMC_t;
+
+
 //#########################################################################################################
 uint8_t QMC_init(QMC_t *qmc,I2C_HandleTypeDef *i2c,uint8_t Output_Data_Rate);
 uint8_t QMC_read(QMC_t *qmc);
 float   QMC_readHeading(QMC_t *qmc);
 uint8_t QMC_Standby(QMC_t *qmc);
 uint8_t QMC_Reset(QMC_t *qmc);
-
-
-
-
 
 //#########################################################################################################
 #ifdef __cplusplus

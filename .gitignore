@@ -55,6 +55,7 @@ dkms.conf
 Debug/
 Release/
 *.metadata/
+*.settings/
 
 /KiCad files/v2/NDE-backups
 /KiCad files/v3/NDE-backups

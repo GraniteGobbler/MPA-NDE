@@ -4,6 +4,9 @@
 	(generator_version "9.0")
 	(uuid "376df90e-4307-4f8d-97b3-9a2739df3fd2")
 	(paper "A4")
+	(title_block
+		(comment 1 "Accelerometer module pin socket")
+	)
 	(lib_symbols
 		(symbol "Connector:Conn_01x08_Socket"
 			(pin_names

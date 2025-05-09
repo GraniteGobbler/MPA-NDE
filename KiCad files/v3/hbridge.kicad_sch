@@ -4,6 +4,9 @@
 	(generator_version "9.0")
 	(uuid "c1803849-81f9-47be-ab8d-2a0b00f3aa87")
 	(paper "A4")
+	(title_block
+		(comment 1 "H-bridge pin socket")
+	)
 	(lib_symbols
 		(symbol "Connector:Conn_01x06_Socket"
 			(pin_names

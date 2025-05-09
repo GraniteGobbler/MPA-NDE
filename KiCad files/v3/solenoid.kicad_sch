@@ -4,6 +4,9 @@
 	(generator_version "9.0")
 	(uuid "6101cb95-6c70-4a13-9263-6562e52b1d61")
 	(paper "A4")
+	(title_block
+		(comment 1 "Solenoid pin socket")
+	)
 	(lib_symbols
 		(symbol "Connector:Conn_01x01_Socket"
 			(pin_names

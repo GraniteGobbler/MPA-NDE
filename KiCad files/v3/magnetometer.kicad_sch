@@ -4,6 +4,9 @@
 	(generator_version "9.0")
 	(uuid "68c5ebb2-b1cf-4eb0-9997-319147433bdc")
 	(paper "A4")
+	(title_block
+		(comment 1 "Magnetometer module pin socket")
+	)
 	(lib_symbols
 		(symbol "Connector:Conn_01x05_Socket"
 			(pin_names

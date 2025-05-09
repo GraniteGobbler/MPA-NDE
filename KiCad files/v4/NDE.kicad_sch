@@ -2222,28 +2222,6 @@
 		)
 		(uuid 5a35ba58-2bc3-45fc-baa3-00f74e84f24e)
 	)
-	(rectangle
-		(start 231.14 80.01)
-		(end 213.36 100.33)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(fill
-			(type none)
-		)
-		(uuid 5e1b82bf-c6f9-4482-91b3-fc0c6d8044d2)
-	)
-	(text "voliteľný"
-		(exclude_from_sim no)
-		(at 205.486 92.71 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "1b03a4dd-7cc0-4deb-9e79-6322b7dc2b05")
-	)
 	(text "Prídavné konektory \nna externý DC/DC menič"
 		(exclude_from_sim no)
 		(at 62.23 85.09 0)
@@ -2264,7 +2242,7 @@
 		)
 		(uuid "8a5bf375-c001-46ee-b8cb-c413fcac7b36")
 	)
-	(text "Panel-mount\nSwitch"
+	(text "Panel-mount\nswitch"
 		(exclude_from_sim no)
 		(at 146.05 49.022 0)
 		(effects
@@ -6948,7 +6926,7 @@
 			(color 0 0 0 0.0000)
 		)
 		(uuid "6c11cebb-cfdc-4e56-8d99-e5f4cba37c8d")
-		(property "Sheetname" "BlackPill V3.0"
+		(property "Sheetname" "BlackPill V2.0"
 			(at 162.56 74.2184 0)
 			(effects
 				(font

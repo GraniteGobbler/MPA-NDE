@@ -44,6 +44,9 @@
 #define COIL_Y2 TIM_CHANNEL_3
 #define COIL_X2 TIM_CHANNEL_4
 #define COIL_X1 TIM_CHANNEL_1
+
+#define DEG_TO_RAD 0.017453292519943295769236907685
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -142,8 +145,8 @@ int main(void)
 	  if(fabs(compassStruct.compas) > 10.0){
 
 		  //Compute opposite angle to external field, needs to be remapped since the magnetometer 0° and coil 0° are offset
-		  // 360 - (External Angle) + 270
-		  coilAntiAngle = 630 - compassStruct.heading;
+		  // 360 - (External Angle) + 270 -> deg to rad
+		  coilAntiAngle = (630 - compassStruct.heading) * DEG_TO_RAD;
 
 		  //Set coil angle
 		  SetCoilAngle(coilAntiAngle);
